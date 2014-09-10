@@ -32,6 +32,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+from __future__ import print_function
+
 import os
 import yaml
 
@@ -43,19 +45,20 @@ views = {}	# The Split Horizon dictionary
 def init(id, cfg):
     '''Populates the external to internal address dictionary'''
     addrs = {}	# IPv4 address(es) on internal (LAN) interface
-    yml = yaml.load(open(os.path.splitext(cfg.python_script)[0]+'.yml'))
-    for ifs in yml.keys():
-        for ip in [l.split()[1] for l in os.popen('/sbin/ifconfig '+ifs) if l.split()[0] == 'inet']:
-            addrs[ip] = IPAddress(ip)   # Collect IPv4 addresses configured on ifs
-        for wan in yml[ifs].keys():
-            lan = yml[ifs][wan]
-            wan = IPNetwork(wan)
-            lan = IPNetwork(lan)
-            for ip in addrs:
-                if addrs[ip] in lan:
-                    # Key the views with a four byte binary of the external IPv4 address
-                    views.update(dict(zip([pack('BBBB', *addr.words) for addr in wan],
-                                                          [str(addr) for addr in lan])))
+    config = yaml.load(open(os.path.splitext(cfg.python_script)[0]+'.yml'))
+    for ifs in config.keys():
+        if type(config[ifs]) is dict:
+            for ip in [l.split()[1] for l in os.popen('/sbin/ifconfig %s 2>/dev/null' % ifs) if l.split()[0] == 'inet']:
+                addrs[ip] = IPAddress(ip)   # Collect IPv4 addresses configured on ifs
+            for wan in config[ifs].keys():
+                lan = config[ifs][wan]
+                wan = IPNetwork(wan)
+                lan = IPNetwork(lan)
+                for ip in addrs:
+                    if addrs[ip] in lan:
+                        # Key the views with a four byte binary of the external IPv4 address
+                        views.update(dict(zip([pack('BBBB', *addr.words) for addr in wan],
+                                                              [str(addr) for addr in lan])))
     return True
 
 def deinit(id):
@@ -101,14 +104,18 @@ def operate(id, event, qstate, qdata):
     return True
 
 if __name__ == '__main__':
-    yml = yaml.load(open(os.path.splitext(__file__)[0]+'.yml'))
-    for ifs in yml.keys():
-        for wan in yml[ifs].keys():
-            lan = yml[ifs][wan]
+    config = yaml.load(open(os.path.splitext(__file__)[0]+'.yml'))
+    if 'redirect' in config:
+        redirect = config['redirect']
+        del config['redirect']
+    else:
+        redirect = 'rdr on wan0 proto tcp to {wan} -> {lan}'
+    for ifs in config.keys():
+        for wan in config[ifs].keys():
+            lan = config[ifs][wan]
             wan = IPNetwork(wan)
             lan = IPNetwork(lan)
             views.update(dict(zip([str(addr) for addr in wan],
                                   [str(addr) for addr in lan])))
     for wan in sorted(views, key=lambda addr: pack('BBBB', *IPAddress(addr).words)):
-        lan = views[wan]
-        print 'rdr on wan0 proto tcp to %s -> %s' % (wan, lan)
+        print(redirect.format(wan=wan, lan=views[wan]))

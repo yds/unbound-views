@@ -1,3 +1,4 @@
+redirect: 'rdr on wan0 proto tcp to {wan} -> {lan}'
 #ifs: 'WAN subnet(s)': 'LAN subnet(s)'
 lan0:
   '169.254.10.0/25': '192.168.10.0/25'

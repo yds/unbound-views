@@ -23,7 +23,7 @@ Quoting again from the [OpenBSD pf FAQ][Split-Horizon DNS]:
 
 [Unbound-Views][] implements the [Split-Horizon DNS][] solution with a [Python][] plugin for the excellent [Unbound][] DNS resolver. This requires that the [Unbound][] DNS resolver has the [Python][] module installed and configured:
 
-```
+```yaml
 server:
   # chroot needs to be disabled otherwise
   # the python module will not load
@@ -37,6 +37,7 @@ python:
 [Unbound-Views][] Split-Horizon is configured with a [YAML][] file located in the same directory as the `views.py` plugin script:
 
 ```yaml
+redirect: 'rdr on wan0 proto tcp to {wan} -> {lan}'
 # ifs ## WAN subnet(s) #### LAN subnet(s) #
 lan0:
        '169.254.10.0/25': '192.168.10.0/25'
@@ -55,9 +56,19 @@ Unlike many other Split-Horizon Views implementations, [Unbound-Views][] does no
 
 [Unbound-Views][] has a convenient pf `rdr` generator which outputs an OpenBSD/pf syntax configuration file ready to pull in to `/etc/pf.conf` with an `include "/etc/pf.rdr"`:
 
-    ~# python /usr/local/etc/unbound/views.py > /etc/pf.rdr
+```sh
+~# python /usr/local/etc/unbound/views.py > /etc/pf.rdr
+```
 
 It's probably a good idea to edit out the redirects for the public IP address assigned to the edge router(s) and the broadcast address. Meaning the first and last redirects in the generated output. If using CARP, then most likely the first three or more redirects need to be omitted.
+
+The optional `redirect:` setting in [views.yml][] defaults to the [OpenBSD pf Redirection][Redirection] syntax:
+
+```
+rdr on wan0 proto tcp to {wan} -> {lan}
+```
+
+Set `redirect:` in [views.yml][] to whatever fits your needs to help you generate the firewall rules.  Be sure to include the _from_ `{wan}` and _to_ `{lan}` variables for the [Python][] format string of the `redirect:` setting.
 
 ## Getting Started
 
