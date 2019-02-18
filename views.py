@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-'''views.py: Split Horizon response packet rewriter plugin for the Unbound DNS resolver'''
+'''views.py: Split Horizon rewriter plugin for the Unbound DNS resolver'''
 
-# Copyright (c) 2012-2014, Yarema <yds@Necessitu.de>
+# Copyright © 2012-2019, Yarema <yds@Necessitu.de>
 #
 # This software is open source.
 #
@@ -32,33 +32,28 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from __future__ import print_function
-
 import os
 import yaml
-
-from struct import pack
+from socket import inet_aton
 from netaddr import *
 
 views = {}	# The Split Horizon dictionary
 
 def init(id, cfg):
-    '''Populates the external to internal address dictionary'''
+    '''Populate the external to internal address mapping'''
     addrs = {}	# IPv4 address(es) on internal (LAN) interface
     config = yaml.load(open(os.path.splitext(cfg.python_script)[0]+'.yml'))
     for ifs in config.keys():
         if type(config[ifs]) is dict:
             for ip in [l.split()[1] for l in os.popen('/sbin/ifconfig %s 2>/dev/null' % ifs) if l.split()[0] == 'inet']:
                 addrs[ip] = IPAddress(ip)   # Collect IPv4 addresses configured on ifs
-            for wan in config[ifs].keys():
-                lan = config[ifs][wan]
+            for wan, lan in config[ifs].items():
                 wan = IPNetwork(wan)
                 lan = IPNetwork(lan)
                 for ip in addrs:
                     if addrs[ip] in lan:
                         # Key the views with a four byte binary of the external IPv4 address
-                        views.update(dict(zip([pack('BBBB', *addr.words) for addr in wan],
-                                                              [str(addr) for addr in lan])))
+                        views.update(zip(map(inet_aton, map(str, wan)), map(str, lan)))
     return True
 
 def deinit(id):
@@ -90,7 +85,7 @@ def operate(id, event, qstate, qdata):
                                 msg = DNSMessage(qstate.qinfo.qname_str, RR_TYPE_A, RR_CLASS_IN, PKT_QR | PKT_RA | PKT_AA)
                                 msg.answer.append('%s IN A %s' % (qstate.qinfo.qname_str, views[addr]))
                                 if msg.set_return_msg(qstate):
-                                    qstate.return_msg.rep.security = 2	#we don't need validation, result is valid
+                                    qstate.return_msg.rep.security = 2	# we don't need validation, result is valid
                                     qstate.return_rcode = RCODE_NOERROR
                                 else:
                                     log_err("pythonmod: cannot create response")
@@ -111,11 +106,9 @@ if __name__ == '__main__':
     else:
         redirect = 'rdr on wan0 proto tcp to {wan} -> {lan}'
     for ifs in config.keys():
-        for wan in config[ifs].keys():
-            lan = config[ifs][wan]
+        for wan, lan in config[ifs].items():
             wan = IPNetwork(wan)
             lan = IPNetwork(lan)
-            views.update(dict(zip([str(addr) for addr in wan],
-                                  [str(addr) for addr in lan])))
-    for wan in sorted(views, key=lambda addr: pack('BBBB', *IPAddress(addr).words)):
+            views.update(zip(map(str, wan), map(str, lan)))
+    for wan in sorted(views, key=inet_aton):
         print(redirect.format(wan=wan, lan=views[wan]))
