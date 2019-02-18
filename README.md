@@ -3,9 +3,9 @@
 [Unbound-Views][] is a Split-Horizon Views plugin for the [Unbound][]
 DNS resolver.
 
-## Problem: [Redirection and Reflection][][Reflection][]
+## Problem: [Redirection and Reflection][Reflection]
 
-Quoting from the [OpenBSD pf FAQ][][Reflection][]:
+Quoting from the [OpenBSD pf FAQ][Reflection]:
 
 > Often, redirection rules are used to forward incoming connections from
 > the Internet to a local server with a private address in the internal
@@ -21,7 +21,7 @@ Quoting from the [OpenBSD pf FAQ][][Reflection][]:
 
 ## Solution: [Split-Horizon DNS][]
 
-Quoting again from the [OpenBSD pf FAQ][][Split-Horizon DNS][]:
+Quoting again from the [OpenBSD pf FAQ][Split-Horizon DNS]:
 
 > It's possible to configure DNS servers to answer queries from local hosts
 > differently than external queries so that local clients will receive the
