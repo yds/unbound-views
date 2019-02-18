@@ -74,7 +74,7 @@ The same [views.yml][] config file can be used on a machine where the
 In that case the first set of subnets will be ignored and only the second
 set will be searched for split horizon candidates.
 
-Unlike many other Split-Horizon Views implementations, [Unbound-Views][]
+Unlike some other Split-Horizon Views implementations, [Unbound-Views][]
 does not require that anything special be configured and served by
 Authoritative DNS servers whether they are under your control or not.
 
