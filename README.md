@@ -115,7 +115,7 @@ setting.
 
 ## License
 
-See [LICENSE](https://GitHub.com/yds/unbound-views/blob/master/LICENSE).
+See [LICENSE](https://GitHub.com/yds/unbound-views/blob/master/LICENSE.md "BSD3CLAUSE").
 
 [Redirection]:http://www.OpenBSD.org/faq/pf/rdr.html "PF: Redirection (Port Forwarding)"
 [Reflection]:http://www.OpenBSD.org/faq/pf/rdr.html#reflect "Redirection and Reflection"
