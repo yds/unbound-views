@@ -46,10 +46,10 @@ def init(id, cfg):
     for ifs in config.keys():
         if type(config[ifs]) is dict:
             for ip in [l.split()[1] for l in os.popen('/sbin/ifconfig %s 2>/dev/null' % ifs) if l.split()[0] == 'inet']:
-                addrs[ip] = IPAddress(ip)   # Collect IPv4 addresses configured on ifs
+                addrs[ip] = IPAddress(ip)	# Collect IPv4 addresses configured on ifs
             for wan, lan in config[ifs].items():
+                lan = IPNetwork('%s/%s' % (lan.split('/')[0], wan.split('/')[1]))
                 wan = IPNetwork(wan)
-                lan = IPNetwork(lan)
                 for ip in addrs:
                     if addrs[ip] in lan:
                         # Key the views with a four byte binary of the external IPv4 address
@@ -107,8 +107,8 @@ if __name__ == '__main__':
         redirect = 'rdr on wan0 proto tcp to {wan} -> {lan}'
     for ifs in config.keys():
         for wan, lan in config[ifs].items():
+            lan = IPNetwork('%s/%s' % (lan.split('/')[0], wan.split('/')[1]))
             wan = IPNetwork(wan)
-            lan = IPNetwork(lan)
             views.update(zip(map(str, wan), map(str, lan)))
     for wan in sorted(views, key=inet_aton):
         print(redirect.format(wan=wan, lan=views[wan]))

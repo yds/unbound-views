@@ -1,7 +1,7 @@
 # [Unbound-Views][]
 
-[Unbound-Views][] is a Split-Horizon Views plugin for the [Unbound][]
-DNS resolver.
+[Unbound-Views][] is a Split-Horizon Views plugin for the [Unbound][] DNS
+resolver.
 
 ## Problem: [Redirection and Reflection][Reflection]
 
@@ -11,10 +11,10 @@ Quoting from the [OpenBSD pf FAQ][Reflection]:
 > the Internet to a local server with a private address in the internal
 > network or LAN, as in:
 >
->     server = 192.168.1.40
+>	server = 192.168.1.40
 >
->     pass in on $ext_if proto tcp from any to $ext_if port 80 \
->         rdr-to $server port 80 
+>	pass in on $ext_if proto tcp from any to $ext_if port 80 \
+>	    rdr-to $server port 80
 >
 > But when the redirection rule is tested from a client on the LAN, it
 > doesn't work.
@@ -50,8 +50,8 @@ in the same directory as the `views.py` plugin script:
 	redirect: 'rdr on wan0 proto tcp to {wan} -> {lan}'
 	# ifs ## WAN subnet(s) #### LAN subnet(s) #
 	lan0:
-	  '169.254.10.0/25': '192.168.10.0/25'
-	  '169.254.20.0/25': '192.168.20.0/25'
+	  '169.254.10.0/25': '192.168.10.0'
+	  '169.254.20.0/25': '192.168.20.0'
 
 The interface, `lan0` in the example above, needs to be the same as the
 interface that [Unbound][] is listening on facing the LAN. Both subnets,
