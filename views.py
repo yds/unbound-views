@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 '''views.py: Split Horizon rewriter plugin for the Unbound DNS resolver'''
 
-# Copyright © 2012-2019, Yarema <yds@Necessitu.de>
+# Copyright © 2012-2020, Yarema <yds@Necessitu.de>
 #
 # This software is open source.
 #
@@ -42,7 +42,7 @@ views = {}	# The Split Horizon dictionary
 def init(id, cfg):
     '''Populate the external to internal address mapping'''
     addrs = {}	# IPv4 address(es) on internal (LAN) interface
-    config = yaml.load(open(os.path.splitext(cfg.python_script)[0]+'.yml'))
+    config = yaml.load(open(os.path.splitext(cfg.python_script)[0]+'.yml'), Loader=yaml.CSafeLoader)
     for ifs in config.keys():
         if type(config[ifs]) is dict:
             for ip in [l.split()[1] for l in os.popen('/sbin/ifconfig %s 2>/dev/null' % ifs) if l.split()[0] == 'inet']:
@@ -99,7 +99,7 @@ def operate(id, event, qstate, qdata):
     return True
 
 if __name__ == '__main__':
-    config = yaml.load(open(os.path.splitext(__file__)[0]+'.yml'))
+    config = yaml.load(open(os.path.splitext(__file__)[0]+'.yml'), Loader=yaml.CSafeLoader)
     if 'redirect' in config:
         redirect = config['redirect']
         del config['redirect']

@@ -1,6 +1,6 @@
 # LICENSE: BSD3CLAUSE
 
-Copyright © 2012-2019, Yarema <yds@Necessitu.de>
+Copyright © 2012-2020, Yarema <yds@Necessitu.de>
 
 This software is open source.
 
