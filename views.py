@@ -42,7 +42,7 @@ views = {}	# The Split Horizon dictionary
 def init(id, cfg):
     '''Populate the external to internal address mapping'''
     addrs = {}	# IPv4 address(es) on internal (LAN) interface
-    config = yaml.load(open(os.path.splitext(cfg.python_script)[0]+'.yml'), Loader=yaml.CSafeLoader)
+    config = yaml.load(open(os.path.splitext(cfg.python_script.str)[0]+'.yml'), Loader=yaml.CSafeLoader)
     for ifs in config.keys():
         if type(config[ifs]) is dict:
             for ip in [l.split()[1] for l in os.popen('/sbin/ifconfig %s 2>/dev/null' % ifs) if l.split()[0] == 'inet']:
