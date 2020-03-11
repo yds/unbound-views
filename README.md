@@ -3,6 +3,10 @@
 [Unbound-Views][] is a Split-Horizon Views plugin for the [Unbound][] DNS
 resolver.
 
+## Same but different
+
+[PowerDNS-renumber.lua][PowerDNS-renumber] and the [Knot-Resolver renumber][Knot-renumber] module.
+
 ## Problem: [Redirection and Reflection][Reflection]
 
 Quoting from the [OpenBSD pf FAQ][Reflection]:
@@ -129,3 +133,5 @@ See [LICENSE](https://GitHub.com/yds/unbound-views/blob/master/LICENSE.md "BSD3C
 [views.py]:https://GitHub.com/yds/unbound-views/blob/master/views.py
 [views.yml]:https://GitHub.com/yds/unbound-views/blob/master/views.yml
 [Unbound-Views]:https://GitHub.com/yds/unbound-views/ "Split-Horizon Views plugin for the Unbound DNS resolver"
+[Knot-renumber]:https://Knot-Resolver.ReadTheDocs.io/en/stable/modules-renumber.html "Knot-Resolver renumber module"
+[PowerDNS-renumber]:https://GitHub.com/yds/PowerDNS-renumber.lua "IP address renumbering Lua script for PowerDNS Recursor"
